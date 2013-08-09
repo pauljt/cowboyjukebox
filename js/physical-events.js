@@ -1,3 +1,11 @@
+function distance(a, b) {
+  var R = 6371; // km
+
+  return Math.acos(Math.sin(a.coords.latitude)*Math.sin(b.coords.latitude) +
+                   Math.cos(a.coords.latitude)*Math.cos(b.coords.latitude) *
+                   Math.cos(b.coords.longitude-a.coords.longitude)) * R;
+}
+
 window.addEventListener("devicemotion", function (e) {
   if (e.acceleration) {
     document.getElementById("acceleration-x").innerHTML = e.acceleration.x
