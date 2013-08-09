@@ -23,18 +23,29 @@ function getID() {
 function sendLocation(crd) {
   var xhr = new XMLHttpRequest();
   var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + id + "&lat=" + crd.latitude + "&lon=" + crd.longitude;
-  console.log(uri);
 
   xhr.open("GET", uri, true);
   xhr.send();
 }
 
-function getLocations() {
+function updateAudio(pos) {
+  var crd = pos.coords;
+
+  // Update the UI with details of your current position.
+  document.getElementById("lat").innerHTML = crd.latitude;
+  document.getElementById("long").innerHTML = crd.longitude;
+  document.getElementById("dist").innerHTML = distance(crd, -28.228853527113206, 153.2699418067932);
+
+  // Share your location with everyone else.
+  sendLocation(crd);
+
+  // Get the locations of all the other band members.
   var xhr = new XMLHttpRequest();
   var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
   xhr.open("GET", uri, true);
   xhr.send();
 
+  // Use the locations of all the other band members to synthesize the sound of the instrument.
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
       console.log(JSON.parse(xhr.responseText));
@@ -43,25 +54,11 @@ function getLocations() {
   }
 }
 
-function success(pos) {
-  var crd = pos.coords;
-
-  // Share your location with everyone else.
-  sendLocation(crd);
-
-  // Get the latest locations of everyone else
-  console.log(getLocations());
-
-  document.getElementById("lat").innerHTML = crd.latitude;
-  document.getElementById("long").innerHTML = crd.longitude;
-  document.getElementById("dist").innerHTML = distance(crd, -28.228853527113206, 153.2699418067932);
-};
-
-function toggleGPS(){
-	if(!GPSwatch){
-		navigator.geolocation.getCurrentPosition(success);
-		GPSwatch=navigator.geolocation.watchPosition(success);
-	}else{
+function toggleGPS() {
+	if (!GPSwatch) {
+		navigator.geolocation.getCurrentPosition(updateAudio);
+		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
+	} else {
 		navigator.geolocation.clearWatch(watchID);
 	}
 }
@@ -71,6 +68,3 @@ window.addEventListener('load',function(){
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
   document.getElementById('phoneid').textContent=id;
 });
-
-
-
