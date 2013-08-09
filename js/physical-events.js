@@ -1,4 +1,9 @@
+'use strict';
+
 var GPSwatch=0;
+var id = getID();
+var sounds = new Array();
+sounds[0] = {lat: -28.228853527113206, lon: 153.2699418067932};
 
 function distance(a, lat, lon) {
   var R = 6371; // km
@@ -7,10 +12,6 @@ function distance(a, lat, lon) {
                    Math.cos(a.latitude)*Math.cos(lat) *
                    Math.cos(lon-a.longitude)) * R;
 }
-
-// -28.228853527113206, 153.2699418067932
-
-var id = getID();
 
 function getID() {
   var id = window.location.toString();
@@ -34,7 +35,6 @@ function updateAudio(pos) {
   // Update the UI with details of your current position.
   document.getElementById("lat").innerHTML = crd.latitude;
   document.getElementById("long").innerHTML = crd.longitude;
-  document.getElementById("dist").innerHTML = distance(crd, -28.228853527113206, 153.2699418067932);
 
   // Share your location with everyone else.
   sendLocation(crd);
@@ -55,16 +55,18 @@ function updateAudio(pos) {
 }
 
 function toggleGPS() {
-	if (!GPSwatch) {
-		navigator.geolocation.getCurrentPosition(updateAudio);
-		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
-	} else {
-		navigator.geolocation.clearWatch(watchID);
-	}
+  console.log("toggling GPS");
+	// if (!GPSwatch) {
+	// 	navigator.geolocation.getCurrentPosition(updateAudio);
+	// 	GPSwatch = navigator.geolocation.watchPosition(updateAudio);
+	// } else {
+	// 	navigator.geolocation.clearWatch(watchID);
+	// }
 }
 
-window.addEventListener('load',function(){
+window.addEventListener('load',function() {
 	document.getElementById('play1').addEventListener('click',SoundManager.handle);
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
+  document.getElementById('gps').addEventListener('click', toggleGPS());
   document.getElementById('phoneid').textContent=id;
 });
