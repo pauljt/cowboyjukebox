@@ -9,6 +9,7 @@
 
         <!-- Load up the controller code. -->
         <script src="js/physical-events.js"></script>
+        <script src="js/soundmanager.js"></script>
     </head>
 
     <body>
@@ -16,5 +17,19 @@
       <p>lat:<span id="lat"></span></p>
       <p>long:<span id="long"></span></p>
       <p>dist:<span id="dist"></span></p>
+
+      <div id='play1'>
+        <audio src="audio/5.wav" preload="auto" ></audio>
+        <button id='play1-button'>play1</button>
+        <span id='play1-volume'></span>
+      </div>
+
+      <div id='play2'>
+        <audio src="audio/6.ogg" preload="auto" ></audio>
+        <button id='play2-button'>play1</button>
+        <span id='play2-volume'></span>
+      </div>
+
+
     </body>
 </html>
