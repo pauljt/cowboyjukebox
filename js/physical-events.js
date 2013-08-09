@@ -20,17 +20,38 @@ function getID() {
   return id;
 }
 
-function update() {
+function sendLocation(crd) {
   var xhr = new XMLHttpRequest();
-  var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + id + "&lat=" + 2.4 + "&lon=" + 2.4;
+  var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + id + "&lat=" + crd.latitude + "&lon=" + crd.longitude;
   console.log(uri);
 
   xhr.open("GET", uri, true);
   xhr.send();
 }
 
+function getLocations() {
+  var xhr = new XMLHttpRequest();
+  var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
+  xhr.open("GET", uri, true);
+  xhr.send();
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      console.log(JSON.parse(xhr.responseText));
+      // UPdate sound levels.
+    }
+  }
+}
+
 function success(pos) {
   var crd = pos.coords;
+
+  // Share your location with everyone else.
+  sendLocation(crd);
+
+  // Get the latest locations of everyone else
+  console.log(getLocations());
+
   document.getElementById("lat").innerHTML = crd.latitude;
   document.getElementById("long").innerHTML = crd.longitude;
   document.getElementById("dist").innerHTML = distance(crd, -28.228853527113206, 153.2699418067932);
