@@ -8,5 +8,8 @@
   },
   "icons": {
     "128": "/style/icons/sensor.png"
+  },
+  "permissions":{
+    "geolocation":{}
   }
 }
