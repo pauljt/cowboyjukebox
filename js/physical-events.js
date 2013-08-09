@@ -10,6 +10,16 @@ function distance(a, lat, lon) {
 
 // -28.228853527113206, 153.2699418067932
 
+var id = getID();
+
+function getID() {
+  var id = window.location.toString();
+  id = id.substring(id.indexOf("//") + 2, id.length - 1);
+  id = id.substring(0, id.indexOf("/"));
+
+  return id;
+}
+
 function success(pos) {
   var crd = pos.coords;
   document.getElementById("lat").innerHTML = crd.latitude;
@@ -29,8 +39,7 @@ function toggleGPS(){
 window.addEventListener('load',function(){
 	document.getElementById('play1').addEventListener('click',SoundManager.handle);
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
-	document.getElementById('phoneid').textContent=window.location;
-
+  document.getElementById('phoneid').textContent=id;
 });
 
 
