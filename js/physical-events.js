@@ -29,6 +29,8 @@ function toggleGPS(){
 window.addEventListener('load',function(){
 	document.getElementById('play1').addEventListener('click',SoundManager.handle);
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
+	document.getElementById('phoneid').textContent=window.location;
+
 });
 
 
