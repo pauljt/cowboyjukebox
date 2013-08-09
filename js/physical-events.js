@@ -21,10 +21,12 @@ function getID() {
 }
 
 function update() {
-  var xhr = XMLHttpRequest();
-  xhr.open("POST","http://cowboyjukebox.herokuapp.com/update",true);
-  xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-  xhr.send("imei=" + encodeURIComponent(id) + "&lat=" + encodeURIComponent(5) + "&lon=" + encodeURIComponent(4));
+  var xhr = new XMLHttpRequest();
+  var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + id + "&lat=" + 2.4 + "&lon=" + 2.4;
+  console.log(uri);
+
+  xhr.open("GET", uri, true);
+  xhr.send();
 }
 
 function success(pos) {
