@@ -67,6 +67,7 @@ function updateAudio(pos) {
 
 function toggleGPS() {
 	if (!GPSwatch) {
+		start(400.0);
 		navigator.geolocation.getCurrentPosition(updateAudio);
 		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
 	} else {
@@ -75,7 +76,6 @@ function toggleGPS() {
 }
 
 window.addEventListener('load', function() {
-  start(400.0);
   document.getElementById('play1').addEventListener('click',SoundManager.handle);
   document.getElementById('play2').addEventListener('click',SoundManager.handle);
   document.getElementById('gps').addEventListener('click', toggleGPS);

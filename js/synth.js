@@ -59,16 +59,23 @@ function requestSoundData(soundData) {
 }
 
 var audioDestination = new AudioDataDestination(sampleRate, requestSoundData);
+var stopped = 0;
 
 function start(freq) {
   currentSoundSample = 0;
+  stopped = 0;
   frequency = parseFloat(freq);
 }
 
 function alterFreq(freq) {
-  frequency = parseFloat(freq);
+  if (!stopped) {
+    frequency = parseFloat(freq);
+  } else {
+    frequency = 0;
+  }
 }
 
 function stop() {
   frequency = 0;
+  stopped = 1;
 }
