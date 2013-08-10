@@ -3,11 +3,12 @@
 var GPSwatch=0;
 var id = getID();
 var sounds = new Array();
-sounds[0] = {freq: 400.0, lat: -28.228853527113206, lon: 153.2699418067932};
-sounds[1] = {freq: 500.0, lat: -28.228987047913034, lon: 153.2698318362236};
-sounds[2] = {freq: 700.0, lat: -28.228978776717906, lon: 153.26967492699623};
-sounds[3] = {freq: 900.0, lat: -28.228721187748544, lon: 153.269724547863};
-sounds[4] = {freq: 1100.0, lat: -28.228722369350738, lon: 153.2699780166149};
+
+sounds[0] = {freq: 700.0, lat: -28.22885825351606, lon: 153.2699418067932};
+sounds[1] = {freq: 900.0, lat: -28.22872591415725, lon: 153.269724547863};
+// sounds[2] = {freq: 400.0, lat: -28.228978776717906, lon: 153.26967492699623};
+// sounds[3] = {freq: 900.0, lat: -28.228721187748544, lon: 153.269724547863};
+// sounds[4] = {freq: 1100.0, lat: -28.228722369350738, lon: 153.2699780166149};
 
 function distance(a_lat, a_lon, b_lat, b_lon) {
   var R = 6371; // km
@@ -18,11 +19,11 @@ function distance(a_lat, a_lon, b_lat, b_lon) {
 }
 
 function getID() {
-  var id = window.location.toString();
-  id = id.substring(id.indexOf("//") + 2, id.length - 1);
-  id = id.substring(0, id.indexOf("/"));
+	if (!localStorage.phone_id) {
+		localStorage.phone_id = Math.random() + "";
+	}
 
-  return id;
+  	return localStorage.phone_id;
 }
 
 function sendLocation(crd) {
@@ -60,7 +61,10 @@ function updateAudio(pos) {
         //update pitch of synth
         var dist = distance(bm[j].lat, bm[j].lon, sounds[j].lat, sounds[j].lon);
         alterFreq(j, dist * sounds[j].freq);
-        //document.getElementById("dist").textContent = dist;
+
+        if (mb[j].imei === id) {
+        	document.getElementById("dist").textContent = dist;
+        }
       }
       //}
     }
