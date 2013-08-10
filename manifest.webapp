@@ -1,13 +1,13 @@
 {
-  "name": "Test Sensors",
-  "description": "Tests basic device sensors includes accelerometer and gyroscope",
+  "name": "Cowboy Jukebox",
+  "description": "A distributed instrument that is in the 'cloud'",
   "launch_path": "/index.html",
   "developer": {
-    "name": "dougt",
-    "url": "http://www.mozilla.org"
+    "name": "Paul Theriault & Clinton Freeman",
+    "url": "http://cowboyjukebox.com/"
   },
   "icons": {
-    "128": "/style/icons/sensor.png"
+    "128": "/style/icons/cowboyjukebox.png"
   },
   "permissions":{
     "geolocation":{}
