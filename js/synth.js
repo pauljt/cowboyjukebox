@@ -65,6 +65,10 @@ function start(freq) {
   frequency = parseFloat(freq);
 }
 
+function alterFreq(freq) {
+  frequency = parseFloat(freq);
+}
+
 function stop() {
   frequency = 0;
 }

@@ -61,9 +61,8 @@ function updateAudio(pos) {
 
   //update pitch of synth
   var dist=distance(crd.latitude,crd.longitude,sounds[0].lat,sounds[0].lon);
-  start(dist+400.0);
+  alterFreq(dist*400.0);
   document.getElementById("freq").textContent =dist*400.0 +"("+dist+")";
-
 }
 
 function toggleGPS() {
