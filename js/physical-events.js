@@ -3,7 +3,11 @@
 var GPSwatch=0;
 var id = getID();
 var sounds = new Array();
-sounds[0] = {lat: -28.228853527113206, lon: 153.2699418067932};
+sounds[0] = {freq: 400.0, lat: -28.228853527113206, lon: 153.2699418067932};
+sounds[1] = {freq: 0.0, lat: -28.228853527113206, lon: 153.2699418067932};
+sounds[2] = {freq: 0.0, lat: -28.228853527113206, lon: 153.2699418067932};
+sounds[3] = {freq: 0.0, lat: -28.228853527113206, lon: 153.2699418067932};
+sounds[4] = {freq: 0.0, lat: -28.228853527113206, lon: 153.2699418067932};
 
 function distance(a_lat, a_lon, b_lat, b_lon) {
   var R = 6371; // km
@@ -50,19 +54,17 @@ function updateAudio(pos) {
     if (xhr.readyState == 4) {
       var bm = JSON.parse(xhr.responseText);
 
-      for (var i = 0; i < bm.length; i++) {
-        for (var j = 0; j < sounds.length; j++ ) {
-          var d = distance(bm[i].lat, bm[i].lon, sounds[j].lat, sounds[j].lon);
-          console.log(d);
-        }
+      //for (var i = 0; i < bm.length; i++) {
+      for (var j = 0; j < bm.length; j++ ) {
+
+        //update pitch of synth
+        var dist = distance(bm[j].lat, bm[j].lon, sounds[j].lat, sounds[j].lon);
+        alterFreq(j, dist * sounds[j].freq);
+        //document.getElementById("dist").textContent = dist;
       }
+      //}
     }
   }
-
-  //update pitch of synth
-  var dist=distance(crd.latitude,crd.longitude,sounds[0].lat,sounds[0].lon);
-  alterFreq(0, dist*400.0);
-  document.getElementById("dist").textContent = dist;
 }
 
 function powerOn() {
@@ -77,13 +79,13 @@ function powerOn() {
 
 function powerOff() {
   stop();
-  navigator.geolocation.clearWatch(watchID);
+  //navigator.geolocation.clearWatch(watchID);
 }
 
 var freqnode;
 window.addEventListener('load', function() {;
   document.getElementById('play').addEventListener('click', powerOn);
-  document.getElementById('stop').addEevntListener('click', powerOff);
+  document.getElementById('stop').addEventListener('click', powerOff);
 
   document.getElementById('phoneid').textContent=id;
   freqnode=document.getElementById("freq")

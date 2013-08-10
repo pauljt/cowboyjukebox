@@ -47,26 +47,17 @@ function AudioDataDestination(sampleRate, readFn) {
 var currentSoundSample;
 var sampleRate = 44100;
 
-function getS(f) {
-  return 2 * Math.PI * f / sampleRate;
-}
-
 function requestSoundData(soundData) {
-  var k = getS(tracks[0]);
   for (var i = 0, size = soundData.length; i < size; i++) {
-    soundData[i] = Math.sin(k * currentSoundSample++);
+    var accum = 0;
+    for (var j = 0; j < tracks.length; j++) {
+      var k = 2 * Math.PI * tracks[j] / sampleRate;
+      accum += Math.sin(k * currentSoundSample);
+    }
+
+    soundData[i] = accum;
+    currentSoundSample++;
   }
-
-  // for (var i=0, size=soundData.length; i<size; i++) {
-  //   // var components = 0.0;
-
-  //   // for (var j = 0; j < tracks.length; j++) {
-  //   //   components +=
-  //   // }
-
-  //   soundData[i] = Math.sin(tracks[0] * currentSoundSample++);
-  //   //currentSoundSample++;
-  // }
 }
 
 var audioDestination = new AudioDataDestination(sampleRate, requestSoundData);
@@ -84,7 +75,6 @@ function alterFreq(i, freq) {
     if(freqnode){
        freqnode.textContent = tracks.join(",");
     }
-
   } else {
     tracks[i] = 0;
   }
