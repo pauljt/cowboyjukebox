@@ -5,12 +5,12 @@ var id = getID();
 var sounds = new Array();
 sounds[0] = {lat: -28.228853527113206, lon: 153.2699418067932};
 
-function distance(a, lat, lon) {
+function distance(a_lat, a_lon, b_lat, b_lon) {
   var R = 6371; // km
 
-  return Math.acos(Math.sin(a.latitude)*Math.sin(lat) +
-                   Math.cos(a.latitude)*Math.cos(lat) *
-                   Math.cos(lon-a.longitude)) * R;
+  return Math.acos(Math.sin(a_lat)*Math.sin(b_lat) +
+                   Math.cos(a_lat)*Math.cos(b_lat) *
+                   Math.cos(b_lon-a_lon)) * R;
 }
 
 function getID() {
@@ -48,25 +48,30 @@ function updateAudio(pos) {
   // Use the locations of all the other band members to synthesize the sound of the instrument.
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
-      console.log(JSON.parse(xhr.responseText));
-      // UPdate sound levels.
+      var bm = JSON.parse(xhr.responseText);
+
+      for (var i = 0; i < bm.length; i++) {
+        for (var j = 0; j < sounds.length; j++ ) {
+          var d = distance(bm[i].lat, bm[i].lon, sounds[j].lat, sounds[j].lon);
+          console.log(d);
+        }
+      }
     }
   }
 }
 
 function toggleGPS() {
-  console.log("toggling GPS");
-	// if (!GPSwatch) {
-	// 	navigator.geolocation.getCurrentPosition(updateAudio);
-	// 	GPSwatch = navigator.geolocation.watchPosition(updateAudio);
-	// } else {
-	// 	navigator.geolocation.clearWatch(watchID);
-	// }
+	if (!GPSwatch) {
+		navigator.geolocation.getCurrentPosition(updateAudio);
+		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
+	} else {
+		navigator.geolocation.clearWatch(watchID);
+	}
 }
 
 window.addEventListener('load',function() {
 	document.getElementById('play1').addEventListener('click',SoundManager.handle);
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
-  document.getElementById('gps').addEventListener('click', toggleGPS());
+  document.getElementById('gps').addEventListener('click', toggleGPS);
   document.getElementById('phoneid').textContent=id;
 });
