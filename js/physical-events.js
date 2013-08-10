@@ -37,8 +37,8 @@ function updateAudio(pos) {
   var crd = pos.coords;
 
   // Update the UI with details of your current position.
-  document.getElementById("lat").textContent = crd.latitude;
-  document.getElementById("lon").textContent = crd.longitude;
+  //document.getElementById("lat").textContent = crd.latitude;
+  //document.getElementById("lon").textContent = crd.longitude;
 
   // Share your location with everyone else.
   sendLocation(crd);
@@ -54,15 +54,19 @@ function updateAudio(pos) {
     if (xhr.readyState == 4) {
       var bm = JSON.parse(xhr.responseText);
 
-      //for (var i = 0; i < bm.length; i++) {
       for (var j = 0; j < bm.length; j++ ) {
 
         //update pitch of synth
         var dist = distance(bm[j].lat, bm[j].lon, sounds[j].lat, sounds[j].lon);
         alterFreq(j, dist * sounds[j].freq);
-        //document.getElementById("dist").textContent = dist;
+
+        // update UI.
+        console.log("foo");
+        console.log(j + "");
+        //console.getElementById(j + "");
+        //document.getElementById(j + "").getElementsByClassName('phoneid')[0].textContent = 'B'
+        document.getElementById(j).getElementsByClassName('phoneid')[0].textContent=bm[j].imei;
       }
-      //}
     }
   }
 }
@@ -87,6 +91,5 @@ window.addEventListener('load', function() {;
   document.getElementById('play').addEventListener('click', powerOn);
   document.getElementById('stop').addEventListener('click', powerOff);
 
-  document.getElementById('phoneid').textContent=id;
   freqnode=document.getElementById("freq")
 });
