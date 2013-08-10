@@ -10,12 +10,16 @@
         <!-- Load up the controller code. -->
         <script src="js/physical-events.js"></script>
         <script src="js/soundmanager.js"></script>
+        <script src="js/synth.js"></script>
     </head>
 
     <body>
       <h3>Geolocation</h3>
       <p>lat:<span id="lat"></span></p>
       <p>long:<span id="long"></span></p>
+
+      <button onclick="start()">play</button>
+      <button onclick="stop()">stop</button>
 
       <p>Phoneid:<span id="phoneid"></span></p>
 

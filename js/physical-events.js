@@ -39,7 +39,7 @@ function updateAudio(pos) {
   // Share your location with everyone else.
   sendLocation(crd);
 
-  // Get the locations of all the other band members.
+  // Get the locations of all the band members (including yourself).
   var xhr = new XMLHttpRequest();
   var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
   xhr.open("GET", uri, true);
@@ -69,7 +69,7 @@ function toggleGPS() {
 	}
 }
 
-window.addEventListener('load',function() {
+window.addEventListener('load', function() {
 	document.getElementById('play1').addEventListener('click',SoundManager.handle);
 	document.getElementById('play2').addEventListener('click',SoundManager.handle);
   document.getElementById('gps').addEventListener('click', toggleGPS);
