@@ -65,19 +65,26 @@ function updateAudio(pos) {
   document.getElementById("dist").textContent = dist;
 }
 
-function toggleGPS() {
+function powerOn() {
 	if (!GPSwatch) {
 		start();
 		navigator.geolocation.getCurrentPosition(updateAudio);
 		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
 	} else {
-		navigator.geolocation.clearWatch(watchID);
+
 	}
+}
+
+function powerOff() {
+  stop();
+  navigator.geolocation.clearWatch(watchID);
 }
 
 var freqnode;
 window.addEventListener('load', function() {;
-  document.getElementById('gps').addEventListener('click', toggleGPS);
+  document.getElementById('play').addEventListener('click', powerOn);
+  document.getElementById('stop').addEevntListener('click', powerOff);
+
   document.getElementById('phoneid').textContent=id;
   freqnode=document.getElementById("freq")
 });

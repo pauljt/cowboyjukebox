@@ -47,13 +47,13 @@ function AudioDataDestination(sampleRate, readFn) {
 var currentSoundSample;
 var sampleRate = 44100;
 
-// function getS(f) {
-//   return 2 * Math.PI * frequency / sampleRate;
-// }
+function getS(f) {
+  return 2 * Math.PI * f / sampleRate;
+}
 
 function requestSoundData(soundData) {
-  var k = 2* Math.PI * tracks[0] / sampleRate;
-  for (var i=0, size=soundData.length; i<size; i++) {
+  var k = getS(tracks[0]);
+  for (var i = 0, size = soundData.length; i < size; i++) {
     soundData[i] = Math.sin(k * currentSoundSample++);
   }
 
