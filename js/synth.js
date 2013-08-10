@@ -60,9 +60,9 @@ function requestSoundData(soundData) {
 
 var audioDestination = new AudioDataDestination(sampleRate, requestSoundData);
 
-function start() {
+function start(freq) {
   currentSoundSample = 0;
-  frequency = parseFloat(400.0);
+  frequency = parseFloat(freq);
 }
 
 function stop() {

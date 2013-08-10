@@ -33,8 +33,8 @@ function updateAudio(pos) {
   var crd = pos.coords;
 
   // Update the UI with details of your current position.
-  document.getElementById("lat").innerHTML = crd.latitude;
-  document.getElementById("long").innerHTML = crd.longitude;
+  document.getElementById("lat").textContent = crd.latitude;
+  document.getElementById("lon").textContent = crd.longitude;
 
   // Share your location with everyone else.
   sendLocation(crd);
@@ -58,6 +58,12 @@ function updateAudio(pos) {
       }
     }
   }
+
+  //update pitch of synth
+  var dist=distance(crd.latitude,crd.longitude,sounds[0].lat,sounds[0].lon);
+  start(dist+400.0);
+  document.getElementById("freq").textContent =dist*400.0 +"("+dist+")";
+
 }
 
 function toggleGPS() {
@@ -70,8 +76,8 @@ function toggleGPS() {
 }
 
 window.addEventListener('load', function() {
-	document.getElementById('play1').addEventListener('click',SoundManager.handle);
-	document.getElementById('play2').addEventListener('click',SoundManager.handle);
+  document.getElementById('play1').addEventListener('click',SoundManager.handle);
+  document.getElementById('play2').addEventListener('click',SoundManager.handle);
   document.getElementById('gps').addEventListener('click', toggleGPS);
   document.getElementById('phoneid').textContent=id;
 });
