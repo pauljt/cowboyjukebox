@@ -61,13 +61,13 @@ function updateAudio(pos) {
 
   //update pitch of synth
   var dist=distance(crd.latitude,crd.longitude,sounds[0].lat,sounds[0].lon);
-  alterFreq(dist*400.0);
-  document.getElementById("freq").textContent =dist*400.0 +"("+dist+")";
+  alterFreq(0, dist*400.0);
+  document.getElementById("dist").textContent = dist;
 }
 
 function toggleGPS() {
 	if (!GPSwatch) {
-		start(400.0);
+		start();
 		navigator.geolocation.getCurrentPosition(updateAudio);
 		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
 	} else {
@@ -75,9 +75,9 @@ function toggleGPS() {
 	}
 }
 
-window.addEventListener('load', function() {
-  document.getElementById('play1').addEventListener('click',SoundManager.handle);
-  document.getElementById('play2').addEventListener('click',SoundManager.handle);
+var freqnode;
+window.addEventListener('load', function() {;
   document.getElementById('gps').addEventListener('click', toggleGPS);
   document.getElementById('phoneid').textContent=id;
+  freqnode=document.getElementById("freq")
 });

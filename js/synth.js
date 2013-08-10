@@ -44,38 +44,52 @@ function AudioDataDestination(sampleRate, readFn) {
 }
 
 // Control and generate the sound.
-var frequency = 0, currentSoundSample;
+var currentSoundSample;
 var sampleRate = 44100;
 
-function requestSoundData(soundData) {
-  if (!frequency) {
-    return; // no sound selected
-  }
+// function getS(f) {
+//   return 2 * Math.PI * frequency / sampleRate;
+// }
 
-  var k = 2* Math.PI * frequency / sampleRate;
+function requestSoundData(soundData) {
+  var k = 2* Math.PI * tracks[0] / sampleRate;
   for (var i=0, size=soundData.length; i<size; i++) {
     soundData[i] = Math.sin(k * currentSoundSample++);
   }
+
+  // for (var i=0, size=soundData.length; i<size; i++) {
+  //   // var components = 0.0;
+
+  //   // for (var j = 0; j < tracks.length; j++) {
+  //   //   components +=
+  //   // }
+
+  //   soundData[i] = Math.sin(tracks[0] * currentSoundSample++);
+  //   //currentSoundSample++;
+  // }
 }
 
 var audioDestination = new AudioDataDestination(sampleRate, requestSoundData);
 var stopped = 0;
+var tracks = [400.0, 0.0, 0.0, 0.0, 0.0];
 
-function start(freq) {
+function start() {
   currentSoundSample = 0;
   stopped = 0;
-  frequency = parseFloat(freq);
 }
 
-function alterFreq(freq) {
+function alterFreq(i, freq) {
   if (!stopped) {
-    frequency = parseFloat(freq);
+    tracks[i] = parseFloat(freq);
+    if(freqnode){
+       freqnode.textContent = tracks.join(",");
+    }
+
   } else {
-    frequency = 0;
+    tracks[i] = 0;
   }
 }
 
 function stop() {
-  frequency = 0;
   stopped = 1;
 }
