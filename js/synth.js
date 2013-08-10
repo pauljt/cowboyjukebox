@@ -72,9 +72,6 @@ function start() {
 function alterFreq(i, freq) {
   if (!stopped) {
     tracks[i] = parseFloat(freq);
-    if(freqnode){
-       freqnode.textContent = tracks.join(",");
-    }
   } else {
     tracks[i] = 0;
   }
@@ -82,4 +79,7 @@ function alterFreq(i, freq) {
 
 function stop() {
   stopped = 1;
+  for (var i = 0; i < tracks.length; i++) {
+    tracks[i] = 0;
+  }
 }
