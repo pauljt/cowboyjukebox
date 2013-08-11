@@ -2,11 +2,12 @@
 
 var GPSwatch=0;
 var id = getID();
+var bmId = 0;
 var sounds = new Array();
 
 sounds[0] = {freq: 700.0, lat: -28.22885825351606, lon: 153.2699418067932};
 sounds[1] = {freq: 900.0, lat: -28.22872591415725, lon: 153.269724547863};
-// sounds[2] = {freq: 400.0, lat: -28.228978776717906, lon: 153.26967492699623};
+sounds[2] = {freq: 400.0, lat: -28.228978776717906, lon: 153.26967492699623};
 // sounds[3] = {freq: 900.0, lat: -28.228721187748544, lon: 153.269724547863};
 // sounds[4] = {freq: 1100.0, lat: -28.228722369350738, lon: 153.2699780166149};
 
@@ -23,7 +24,7 @@ function getID() {
 		localStorage.phone_id = Math.random() + "";
 	}
 
-  	return localStorage.phone_id;
+	return localStorage.phone_id;
 }
 
 function sendLocation(crd) {
@@ -34,8 +35,27 @@ function sendLocation(crd) {
   xhr.send();
 }
 
-function updateAudio(pos) {
+function updateAudio(imei, id, lat, lon, sound) {
+    //update pitch of synth
+    console.log(sound);
+    var dist = distance(lat, lon, sound.lat, sound.lon);
+    var afreq = dist * sound.freq;
+    alterFreq(id, afreq);
+
+    // update UI.
+    document.getElementById(id).getElementsByClassName('phoneid')[0].textContent = imei;
+    document.getElementById(id).getElementsByClassName('lat')[0].textContent = lat;
+    document.getElementById(id).getElementsByClassName('lon')[0].textContent = lon;
+    document.getElementById(id).getElementsByClassName('bfreq')[0].textContent = sound.freq;
+    document.getElementById(id).getElementsByClassName('afreq')[0].textContent = afreq;
+    document.getElementById(id).getElementsByClassName('dist')[0].textContent = dist;
+}
+
+function updatePosition(pos) {
   var crd = pos.coords;
+
+  // If we know what our band member ID, we can perform a live update.
+  updateAudio(id, bmId, crd.latitude, crd.longitude, sounds[bmId]);
 
   // Share your location with everyone else.
   sendLocation(crd);
@@ -51,21 +71,12 @@ function updateAudio(pos) {
     if (xhr.readyState == 4) {
       var bm = JSON.parse(xhr.responseText);
 
-      for (var j = 0; j < bm.length; j++ ) {
-
-        //update pitch of synth
-        var dist = distance(bm[j].lat, bm[j].lon, sounds[j].lat, sounds[j].lon);
-        var afreq = dist * sounds[j].freq;
-        alterFreq(j, afreq);
-
-        // update UI.
-        document.getElementById(j).getElementsByClassName('phoneid')[0].textContent=bm[j].imei;
-        document.getElementById(j).getElementsByClassName('lat')[0].textContent=bm[j].lat;
-        document.getElementById(j).getElementsByClassName('lon')[0].textContent=bm[j].lon;
-        document.getElementById(j).getElementsByClassName('bfreq')[0].textContent=sounds[j].freq;
-        document.getElementById(j).getElementsByClassName('afreq')[0].textContent=afreq;
-        document.getElementById(j).getElementsByClassName('dist')[0].textContent=dist;
-
+      for (var j = 0; j < bm.length; j++) {
+        if (bm[j].imei === id) {
+          bmId = j;
+        } else {
+          updateAudio(bm[j].imei, j, bm[j].lat, bm[j].lon, sounds[j]);
+        }
       }
     }
   }
@@ -74,8 +85,8 @@ function updateAudio(pos) {
 function powerOn() {
 	if (!GPSwatch) {
 		start();
-		navigator.geolocation.getCurrentPosition(updateAudio);
-		GPSwatch = navigator.geolocation.watchPosition(updateAudio);
+		navigator.geolocation.getCurrentPosition(updatePosition);
+		GPSwatch = navigator.geolocation.watchPosition(updatePosition);
 	} else {
 
 	}
