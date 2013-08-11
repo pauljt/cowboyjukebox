@@ -1,11 +1,18 @@
 'use strict';
 
 var GPSwatch=0;
-var id = getID();
-
 var can_send = true;
 
-var sources= {}
+var myInstrument;
+var instruments=[];
+var mySource;
+var sources={};
+
+//UI Elements
+var statusNode;
+
+//polling
+var polling;
 
 function distance(a_lat, a_lon, b_lat, b_lon) {
   var R = 6371; // km
@@ -17,57 +24,121 @@ function distance(a_lat, a_lon, b_lat, b_lon) {
 
 function getID() {
 	if (!localStorage.phone_id) {
-		localStorage.phone_id = Math.random() + "";
+		localStorage.phone_id = s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                            s4() + '-' + s4() + s4() + s4()
 	}
 
 	return localStorage.phone_id;
 }
 
-function sendLocation(crd) {
-  var xhr = new XMLHttpRequest();
-  var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + id + "&lat=" + crd.latitude + "&lon=" + crd.longitude;
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+             .toString(16)
+             .substring(1);
+};
 
+function registerInstrument(e) {
+  statusNode.textContent='got geolocation';
+
+  //Add our own instrument.
+  var imei=getID();
+  myInstrument={ imei : imei,
+    slat:e.coords.latitude,
+    slon:e.coords.longitude,
+    lat:e.coords.latitude,
+    lon:e.coords.longitude
+  }
+
+  sources[imei]=T("sin").play();
+  modifySource(myInstrument);
+  polling = setInterval(syncInstruments,1000);
+
+  //tell the server about us
+  statusNode.textContent='Registering...';
+  var xhr = new XMLHttpRequest();
+  var uri = "http://cowboyjukebox.herokuapp.com/mk-instrument?imei=" + imei + "&slat=" + myInstrument.slat+ "&slon=" + myInstrument.slon + "&lat=" + myInstrument.lat+ "&lon=" + myInstrument.lon;
   xhr.open("GET", uri, true);
   xhr.send();
-}
-
-function updateAudio(phoneid, sid, lat, lon, sound) {
-    // first add the source if it doesn't exist
-    if(!(phoneid in sources)){
-    	var src = T("sin").play();
-    	sources[phoneid]={lat:0,lon:0,audio:src};
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      statusNode.textContent= 'Registered';
     }
-
-    // modify source
-    var dist = distance(lat, lon, sound.lat, sound.lon);
-    var afreq = dist * sound.freq;
-    sources[phoneid].audio.set({freq:afreq});
-    //alterFreq(id, afreq);
-
-    // update UI.
-    //document.getElementById(sid).getElementsByClassName('phoneid')[0].textContent = imei;
-    //document.getElementById(sid).getElementsByClassName('lat')[0].textContent = lat;
-    //document.getElementById(sid).getElementsByClassName('lon')[0].textContent = lon;
-    //document.getElementById(sid).getElementsByClassName('bfreq')[0].textContent = sound.freq;
-    //document.getElementById(sid).getElementsByClassName('afreq')[0].textContent = afreq;
-    //document.getElementById(sid).getElementsByClassName('dist')[0].textContent = dist;
+  }
+  xhr.onerror=function(e) {
+    statusNode.textContent= 'Error registering device:'+e.message;
+  }
+  navigator.geolocation.clearWatch(GPSwatch);
+  GPSwatch = navigator.geolocation.watchPosition(updatePosition);
 }
 
-function updatePosition(pos) {
-  var crd = pos.coords;
+function updatePosition(e) {
+  //update local instrument
+  myInstrument.lat = e.coords.latitude;
+  myInstrument.lon = e.coords.longitude;
+  modifySource(myInstrument);
 
-  // If we know what our band member ID, we can perform a live update.
-  updateAudio(id, bmId, crd.latitude, crd.longitude, sounds[bmId]);
+  updateInstrumentUI();
+}
 
+function createSource(instrument) {
+
+}
+
+function createInstrumentHTML(instrument) {
+  var ul=document.createElement('ul');
+
+  var li1=document.createElement('li');
+  li1.textContent="Phone ID:"+instrument.imei;
+
+  var li2=document.createElement('li');
+  li2.textContent="lat:"+instrument.lat;
+
+  var li3=document.createElement('li');
+  li3.textContent="lon:"+instrument.lon;
+
+  var li4=document.createElement('li');
+  li4.textContent="dist:"+distance(instrument.slat,instrument.slon,instrument.lat,instrument.lon);
+
+  ul.appendChild(li1);
+  ul.appendChild(li2);
+  ul.appendChild(li3);
+  ul.appendChild(li4);
+
+  return ul
+}
+
+function updateInstrumentUI() {
+  var div = document.getElementById('instruments');
+  div.innerHTML = '';
+  div.appendChild(createInstrumentHTML(myInstrument));
+
+  for (var i = 0; i < instruments.length; i++) {
+    div.appendChild(createInstrumentHTML(instruments[i]));
+  }
+}
+
+function modifySource(instrument) {
+  // todo update instrument based on lat and lon
+  var source=sources[instrument.imei];
+
+  var lat=instrument.lat;
+  var lon=instrument.lon;
+  var dist=distance(instrument.slat,instrument.slon,instrument.lat,instrument.lon);
+
+  //do some cool shit yo
+  source.set({freq:dist,phase:lat});
+}
+
+//once we register ourselves, we start polling the server for other intruments
+function syncInstruments() {
+  //send out position to server
   if (can_send) {
     document.getElementById('transmit').textContent = "SENDING";
     can_send = false;
-    // Share your location with everyone else.
-    sendLocation(crd);
 
     // Get the locations of all the band members (including yourself).
     var xhr = new XMLHttpRequest();
-    var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
+    var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + myInstrument.imei + "&lat=" + myInstrument.lat + "&lon=" + myInstrument.lon+"&rand="+Math.random();
     xhr.open("GET", uri, true);
     xhr.send();
 
@@ -75,15 +146,19 @@ function updatePosition(pos) {
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
         can_send = true;
+        statusNode.textContent = 'Recieved update ('+new Date()+')';
         document.getElementById('transmit').textContent = "RECEIVED";
-        var bm = JSON.parse(xhr.responseText);
+        instruments = JSON.parse(xhr.responseText);
 
-        for (var j = 0; j < bm.length; j++) {
-          if (bm[j].imei === id) {
-            bmId = j;
-          } else {
-            updateAudio(bm[j].imei, j, bm[j].lat, bm[j].lon, sounds[j]);
+        updateInstrumentUI();
+
+        for (var i = 0; i < instruments.length; i++) {
+          if (instruments[i].imei &&!(instruments[i].imei in sources)) {
+            console.log('adding instrument:'+instruments[i].imei)
+            sources[instruments[i].imei]=T("sin").play();
           }
+
+          modifySource(instruments[i]);
         }
       }
     }
@@ -91,31 +166,28 @@ function updatePosition(pos) {
 }
 
 function powerOn() {
-
-	if (!GPSwatch) {
-		//start();
-
-		//add our source
-		var src = T("sin").play();
-		sources[id]={lat:0,lon:0,audio:src};
-		sources[id].audio.set({freq:400});
-
-		navigator.geolocation.getCurrentPosition(updatePosition);
-		GPSwatch = navigator.geolocation.watchPosition(updatePosition);
-	} else {
-
-	}
+    GPSwatch = navigator.geolocation.watchPosition(registerInstrument);
+    statusNode.textContent='Looking for geolocation...';
 }
 
 function powerOff() {
-  stop();
-  delete sources[id];
-  //navigator.geolocation.clearWatch(watchID);
+  for (guid in sources) {
+    sources[guid].pause();
+  }
+  sources = {};
+
+  myInstrument = null;
+  instruments = null;
+
+  // stop listening to GPS events
+  navigator.geolocation.clearWatch(GPSwatch);
+  clearInterval(polling);
 }
 
-var freqnode;
 window.addEventListener('load', function() {
-  document.getElementById('id').textContent = id;
+  document.getElementById('imei').textContent = getID();
   document.getElementById('play').addEventListener('click', powerOn);
   document.getElementById('stop').addEventListener('click', powerOff);
+
+  statusNode=document.getElementById('status');
 });
