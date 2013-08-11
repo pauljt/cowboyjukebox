@@ -12,6 +12,8 @@ sounds[2] = {freq: 400.0, lat: -28.228978776717906, lon: 153.26967492699623};
 // sounds[3] = {freq: 900.0, lat: -28.228721187748544, lon: 153.269724547863};
 // sounds[4] = {freq: 1100.0, lat: -28.228722369350738, lon: 153.2699780166149};
 
+var sources= {}
+
 function distance(a_lat, a_lon, b_lat, b_lon) {
   var R = 6371; // km
 
@@ -36,7 +38,29 @@ function sendLocation(crd) {
   xhr.send();
 }
 
-function updateAudio(imei, id, lat, lon, sound) {
+function updateAudio(phoneid, sid, lat, lon, sound) {
+    // first add the source if it doesn't exist
+    if(!(phoneid in sources)){
+    	var src = T("sin").play();
+    	sources[phoneid]={lat:0,lon:0,audio:src};
+    }
+
+    // modify source
+    var dist = distance(lat, lon, sound.lat, sound.lon);
+    var afreq = dist * sound.freq;
+    sources[phoneid].audio.set({freq:afreq});
+    //alterFreq(id, afreq);
+
+    // update UI.
+    //document.getElementById(sid).getElementsByClassName('phoneid')[0].textContent = imei;
+    //document.getElementById(sid).getElementsByClassName('lat')[0].textContent = lat;
+    //document.getElementById(sid).getElementsByClassName('lon')[0].textContent = lon;
+    //document.getElementById(sid).getElementsByClassName('bfreq')[0].textContent = sound.freq;
+    //document.getElementById(sid).getElementsByClassName('afreq')[0].textContent = afreq;
+    //document.getElementById(sid).getElementsByClassName('dist')[0].textContent = dist;
+}
+
+function updateAudioOld(imei, id, lat, lon, sound) {
     //update pitch of synth
     console.log(sound);
     var dist = distance(lat, lon, sound.lat, sound.lon);
@@ -90,8 +114,15 @@ function updatePosition(pos) {
 }
 
 function powerOn() {
+
 	if (!GPSwatch) {
-		start();
+		//start();
+
+		//add our source
+		var src = T("sin").play();
+		sources[id]={lat:0,lon:0,audio:src};
+		sources[id].audio.set({freq:400});
+
 		navigator.geolocation.getCurrentPosition(updatePosition);
 		GPSwatch = navigator.geolocation.watchPosition(updatePosition);
 	} else {
@@ -101,6 +132,7 @@ function powerOn() {
 
 function powerOff() {
   stop();
+  delete sources[id];
   //navigator.geolocation.clearWatch(watchID);
 }
 
