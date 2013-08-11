@@ -49,9 +49,9 @@ function registerInstrument(e) {
     lon:e.coords.longitude
   }
 
-  sources[imei]=T("sin").play();
+  createSource(myInstrument);
   modifySource(myInstrument);
-  polling = setInterval(syncInstruments,1000);
+  polling = setInterval(syncInstruments, 1000);
 
   //tell the server about us
   statusNode.textContent='Registering...';
@@ -76,13 +76,46 @@ function updatePosition(e) {
   myInstrument.lat = e.coords.latitude;
   myInstrument.lon = e.coords.longitude;
   modifySource(myInstrument);
-
   updateInstrumentUI();
+
+  navigator.geolocation.clearWatch(GPSwatch);
+  setTimeout(function() {GPSwatch = navigator.geolocation.watchPosition(updatePosition);}, 1000);
 }
 
 function createSource(instrument) {
+  //sources[instrument.imei]=T("sin").play();
+  sources[instrument.imei] = {}
+  sources[instrument.imei].step = 0;
+  sources[instrument.imei].interval = 500;
+  sources[instrument.imei].osc = T("osc");
+  sources[instrument.imei].env = T("perc", {a:50, r:2500});
+  sources[instrument.imei].oscenv = T("OscGen", {osc:sources[instrument.imei].osc, env:sources[instrument.imei].env , mul:0.15}).play();
+
+  sources[instrument.imei].tune=T("interval", {interval:sources[instrument.imei].interval}, function(count) {
+    var noteNum  = 69 + [0, 2, 4, 7, 9, 12,14,16,19,21][sources[instrument.imei].step % 10];
+    var velocity = 64 + (count % 64);
+    sources[instrument.imei].oscenv.noteOn(noteNum, velocity);
+  }).start();
+}
+
+function modifySource(instrument) {
+  // todo update instrument based on lat and lon
+  var source=sources[instrument.imei];
+
+  var lat=~~(distance(instrument.slat,0,instrument.lat,0)*10);
+  var lon=~~(distance(0,instrument.slon,0,instrument.lon)*10);
+  var dist=distance(instrument.slat,instrument.slon,instrument.lat,instrument.lon);
+
+  console.log(dist,lat,lon);
+
+  //do some cool shit yo
+  //source.set({freq:300+(dist*400),phase:lat});
+
+  sources[instrument.imei].tune.set({'interval':Math.abs(2000 - (~~(dist*50)))})
+  sources[instrument.imei].step=lat;
 
 }
+
 
 function createInstrumentHTML(instrument) {
   var ul=document.createElement('ul');
@@ -117,18 +150,6 @@ function updateInstrumentUI() {
   }
 }
 
-function modifySource(instrument) {
-  // todo update instrument based on lat and lon
-  var source=sources[instrument.imei];
-
-  var lat=instrument.lat;
-  var lon=instrument.lon;
-  var dist=distance(instrument.slat,instrument.slon,instrument.lat,instrument.lon);
-
-  //do some cool shit yo
-  source.set({freq:300+(dist*400),phase:lat});
-}
-
 //once we register ourselves, we start polling the server for other intruments
 function syncInstruments() {
   //send out position to server
@@ -150,12 +171,10 @@ function syncInstruments() {
         document.getElementById('transmit').textContent = "RECEIVED";
         instruments = JSON.parse(xhr.responseText);
 
-        updateInstrumentUI();
-
         for (var i = 0; i < instruments.length; i++) {
           if (instruments[i].imei &&!(instruments[i].imei in sources)) {
             console.log('adding instrument:'+instruments[i].imei)
-            sources[instruments[i].imei]=T("sin").play();
+            createSource(instruments[i]);
           }
 
           modifySource(instruments[i]);
@@ -175,10 +194,10 @@ function powerOff() {
   navigator.geolocation.clearWatch(GPSwatch);
   clearInterval(polling);
 
-  sources[myInstrument.imei].pause();
+  sources[myInstrument.imei].tune.pause();
 
   for (var i = 0; i < instruments.length; i++) {
-    sources[instruments[i].imei].pause();
+    sources[instruments[i].imei].tune.pause();
   }
 
   sources = {};
