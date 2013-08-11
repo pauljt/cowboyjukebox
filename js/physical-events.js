@@ -150,6 +150,8 @@ function updateInstrumentUI() {
   }
 }
 
+
+
 //once we register ourselves, we start polling the server for other intruments
 function syncInstruments() {
   //send out position to server
@@ -170,6 +172,8 @@ function syncInstruments() {
         statusNode.textContent = 'Recieved update ('+new Date()+')';
         document.getElementById('transmit').textContent = "RECEIVED";
         instruments = JSON.parse(xhr.responseText);
+
+        updateInstrumentUI();
 
         for (var i = 0; i < instruments.length; i++) {
           if (instruments[i].imei &&!(instruments[i].imei in sources)) {
