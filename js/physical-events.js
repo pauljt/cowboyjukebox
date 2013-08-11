@@ -57,7 +57,7 @@ function registerInstrument(e) {
   statusNode.textContent='Registering...';
   var xhr = new XMLHttpRequest();
   var uri = "http://cowboyjukebox.herokuapp.com/mk-instrument?imei=" + imei + "&slat=" + myInstrument.slat+ "&slon=" + myInstrument.slon + "&lat=" + myInstrument.lat+ "&lon=" + myInstrument.lon;
-  xhr.open("GET", uri, true);
+  xhr.open("GET", uri);
   xhr.send();
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
@@ -126,7 +126,7 @@ function modifySource(instrument) {
   var dist=distance(instrument.slat,instrument.slon,instrument.lat,instrument.lon);
 
   //do some cool shit yo
-  source.set({freq:dist,phase:lat});
+  source.set({freq:300+(dist*400),phase:lat});
 }
 
 //once we register ourselves, we start polling the server for other intruments
@@ -139,7 +139,7 @@ function syncInstruments() {
     // Get the locations of all the band members (including yourself).
     var xhr = new XMLHttpRequest();
     var uri = "http://cowboyjukebox.herokuapp.com/update?imei=" + myInstrument.imei + "&lat=" + myInstrument.lat + "&lon=" + myInstrument.lon+"&rand="+Math.random();
-    xhr.open("GET", uri, true);
+    xhr.open("GET", uri);
     xhr.send();
 
     // Use the locations of all the other band members to synthesize the sound of the instrument.
@@ -171,17 +171,22 @@ function powerOn() {
 }
 
 function powerOff() {
-  for (guid in sources) {
-    sources[guid].pause();
+   // stop listening to GPS events
+  navigator.geolocation.clearWatch(GPSwatch);
+  clearInterval(polling);
+
+  sources[myInstrument.imei].pause();
+
+  for (var i = 0; i < instruments.length; i++) {
+    sources[instruments[i].imei].pause();
   }
+
   sources = {};
 
   myInstrument = null;
   instruments = null;
 
-  // stop listening to GPS events
-  navigator.geolocation.clearWatch(GPSwatch);
-  clearInterval(polling);
+
 }
 
 window.addEventListener('load', function() {
