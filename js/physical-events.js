@@ -4,6 +4,7 @@ var GPSwatch=0;
 var id = getID();
 var bmId = 0;
 var sounds = new Array();
+var can_send = true;
 
 sounds[0] = {freq: 700.0, lat: -28.22885825351606, lon: 153.2699418067932};
 sounds[1] = {freq: 900.0, lat: -28.22872591415725, lon: 153.269724547863};
@@ -57,25 +58,31 @@ function updatePosition(pos) {
   // If we know what our band member ID, we can perform a live update.
   updateAudio(id, bmId, crd.latitude, crd.longitude, sounds[bmId]);
 
-  // Share your location with everyone else.
-  sendLocation(crd);
+  if (can_send) {
+    document.getElementById('transmit').textContent = "SENDING";
+    can_send = false;
+    // Share your location with everyone else.
+    sendLocation(crd);
 
-  // Get the locations of all the band members (including yourself).
-  var xhr = new XMLHttpRequest();
-  var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
-  xhr.open("GET", uri, true);
-  xhr.send();
+    // Get the locations of all the band members (including yourself).
+    var xhr = new XMLHttpRequest();
+    var uri = "http://cowboyjukebox.herokuapp.com/?rand=" + Math.random();
+    xhr.open("GET", uri, true);
+    xhr.send();
 
-  // Use the locations of all the other band members to synthesize the sound of the instrument.
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-      var bm = JSON.parse(xhr.responseText);
+    // Use the locations of all the other band members to synthesize the sound of the instrument.
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4) {
+        can_send = true;
+        document.getElementById('transmit').textContent = "RECEIVED";
+        var bm = JSON.parse(xhr.responseText);
 
-      for (var j = 0; j < bm.length; j++) {
-        if (bm[j].imei === id) {
-          bmId = j;
-        } else {
-          updateAudio(bm[j].imei, j, bm[j].lat, bm[j].lon, sounds[j]);
+        for (var j = 0; j < bm.length; j++) {
+          if (bm[j].imei === id) {
+            bmId = j;
+          } else {
+            updateAudio(bm[j].imei, j, bm[j].lat, bm[j].lon, sounds[j]);
+          }
         }
       }
     }
@@ -98,7 +105,8 @@ function powerOff() {
 }
 
 var freqnode;
-window.addEventListener('load', function() {;
+window.addEventListener('load', function() {
+  document.getElementById('id').textContent = id;
   document.getElementById('play').addEventListener('click', powerOn);
   document.getElementById('stop').addEventListener('click', powerOff);
 });
