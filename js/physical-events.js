@@ -93,7 +93,7 @@ function createSource(instrument) {
 
   sources[instrument.imei].tune=T("interval", {interval:sources[instrument.imei].interval}, function(count) {
     var noteNum  = 69 + [0, 2, 4, 7, 9, 12,14,16,19,21][sources[instrument.imei].step % 10];
-    var velocity = 64 + (count % 64);
+    var velocity = 128;
     sources[instrument.imei].oscenv.noteOn(noteNum, velocity);
   }).start();
 }
@@ -111,7 +111,7 @@ function modifySource(instrument) {
   //do some cool shit yo
   //source.set({freq:300+(dist*400),phase:lat});
 
-  sources[instrument.imei].tune.set({'interval':Math.abs(2000 - (~~(dist*50)))})
+  sources[instrument.imei].tune.set({'interval':Math.abs(2000 - (~~(dist*500)))})
   sources[instrument.imei].step=lat;
 
 }

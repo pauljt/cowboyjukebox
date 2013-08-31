@@ -1,27 +1,54 @@
 <!doctype html>
 
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="stylesheet" type="text/css" href="style/cowboy.css" />
+<head>
+    <script src="http://localhost:8080/target/target-script-min.js#anonymous"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet" type="text/css" href="style/cowboy.css"/>
 
-        <title>Test Sensors</title>
+    <title>Cowboy Jukebox</title>
 
-        <!-- Load up the controller code. -->
-        <script src="js/physical-events.js"></script>
-        <script src="js/timbre.js"></script>
-    </head>
 
-    <body>
-      <button id='play'>play</button>
-      <button id='stop'>stop</button>
-      <a href='testSynth.html'>test synth'</a>
-      <hr/>
-      <p>Your Device: <span id="imei"></span></p>
-      <p>Transmit: <span id="transmit"></span></p>
-      <p>Status: <span id="status"></span></p>
-      <hr/>
-      <div id='instruments'/>
-    </body>
+    <script src="js/physical-events.js"></script>
+    <script src="js/timbre.js"></script>
+    <script src="js/instrument.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/sensor.js"></script>
+</head>
+
+<body>
+<button id='play'>play</button>
+<button id='stop'>stop</button>
+<a href='testSynth.html'>test synth'</a>
+<hr/>
+<p>Your Device: <span id="imei"></span></p>
+
+<p>Transmit: <span id="transmit"></span></p>
+
+<p>Status: <span id="status"></span></p>
+<hr/>
+<div id='instruments'/>
+<div id='player'>
+    <p>
+        <button id='player_play'>play</button>
+        <button id='player_stop'>stop</button>
+    </p>
+    <p>
+        Pitch
+        <button id='player_pitchup'>+</button>
+        <button id='player_pitchdown'>-</button>
+    </p>
+    <p>
+        Tempo
+        <button id='player_tempoup'>+</button>
+        <button id='player_tempodown'>-</button>
+    </p>
+
+    <div id='pad'>
+
+    </div>
+
+</div>
+</body>
 </html>

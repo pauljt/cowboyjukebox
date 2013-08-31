@@ -8,3 +8,9 @@ li {
   margin-left:0px;
   padding-left:0px;
 }
+
+#pad{
+    width:100px;
+    height:100px;
+    background-color:steelblue;
+}
