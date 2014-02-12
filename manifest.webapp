@@ -6,10 +6,12 @@
     "name": "Paul Theriault & Clinton Freeman",
     "url": "http://cowboyjukebox.com/"
   },
+  "type": "privileged",
   "icons": {
     "128": "/style/icons/cowboyjukebox.png"
   },
-  "permissions":{
-    "geolocation":{}
+  "permissions": {
+    "geolocation": {},
+    "audio-capture": {}
   }
 }

@@ -2,7 +2,7 @@
 
 <html>
 <head>
-    <script src="http://localhost:8080/target/target-script-min.js#anonymous"></script>
+
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width"/>
     <link rel="stylesheet" type="text/css" href="style/cowboy.css"/>
@@ -10,11 +10,18 @@
     <title>Cowboy Jukebox</title>
 
 
-    <script src="js/physical-events.js"></script>
+   <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+   <!--<script src="js/TB.min.js"></script>-->
+   <script src="js/peer.js"></script>
+   <!--<script src="js/physical-events.js"></script>
     <script src="js/timbre.js"></script>
     <script src="js/instrument.js"></script>
     <script src="js/player.js"></script>
-    <script src="js/sensor.js"></script>
+    <script src="js/sensor.js"></script>-->
+
+
+
+
 </head>
 
 <body>
@@ -23,6 +30,12 @@
 <a href='testSynth.html'>test synth'</a>
 <hr/>
 <p>Your Device: <span id="imei"></span></p>
+<p>
+        <button id='connect'>connect</button>
+
+        <input id='peer'></input>
+        <button id='send'>send</button>
+</p>
 
 <p>Transmit: <span id="transmit"></span></p>
 
@@ -30,6 +43,7 @@
 <hr/>
 <div id='instruments'/>
 <div id='player'>
+
     <p>
         <button id='player_play'>play</button>
         <button id='player_stop'>stop</button>
